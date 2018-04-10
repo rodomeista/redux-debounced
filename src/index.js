@@ -19,10 +19,12 @@ export default () => {
     const dispatchNow = leading && !timers[key];
 
     const later = () => {
-      if (trailing && !dispatchNow) {
-        dispatch(action);
-      }
-      timers[key] = null;
+      return new Promise(resolve => {
+        if (trailing && !dispatchNow) {
+          resolve(dispatch(action));
+        }
+        timers[key] = null;
+      })
     }
 
     if (!shouldDebounce) {
@@ -35,11 +37,14 @@ export default () => {
     }
 
     if (!cancel) {
-      if (dispatchNow) {
-        dispatch(action);
-      }
+      return new Promise(resolve => {
 
-      timers[key] = setTimeout(later, time);
+        if (dispatchNow) {
+          resolve(dispatch(action));
+        }
+
+        timers[key] = setTimeout(later, time);
+      })
     }
   };
 
