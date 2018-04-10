@@ -1,56 +1,49 @@
-"use strict";
+export default () => {
+  let timers = {};
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+  const middleware = () => dispatch => action => {
+    const {
+      meta: { debounce={} }={},
+      type
+    } = action;
 
-exports.default = function () {
-    let timers = {};
+    const {
+      time,
+      key = type,
+      cancel = false,
+      leading = false,
+      trailing = true
+    } = debounce;
 
-    const middleware = () => dispatch => action => {
-      const {
-        meta: { debounce={} }={},
-        type
-      } = action;
+    const shouldDebounce = ((time && key) || (cancel && key)) && (trailing || leading);
+    const dispatchNow = leading && !timers[key];
 
-      const {
-        time,
-        key = type,
-        cancel = false,
-        leading = false,
-        trailing = true
-      } = debounce;
+    const later = () => {
+      if (trailing && !dispatchNow) {
+        dispatch(action);
+      }
+      timers[key] = null;
+    }
 
-      const shouldDebounce = ((time && key) || (cancel && key)) && (trailing || leading);
-      const dispatchNow = leading && !timers[key];
+    if (!shouldDebounce) {
+      return dispatch(action);
+    }
 
-      const later = () => {
-        if (trailing && !dispatchNow) {
-          dispatch(action);
-        }
-        timers[key] = null;
+    if (timers[key]) {
+      clearTimeout(timers[key]);
+      timers[key] = null;
+    }
+
+    if (!cancel) {
+      if (dispatchNow) {
+        dispatch(action);
       }
 
-      if (!shouldDebounce) {
-        return dispatch(action);
-      }
+      timers[key] = setTimeout(later, time);
+    }
+  };
 
-      if (timers[key]) {
-        clearTimeout(timers[key]);
-        timers[key] = null;
-      }
+  middleware._timers = timers;
 
-      if (!cancel) {
-        if (dispatchNow) {
-          dispatch(action);
-        }
-
-        timers[key] = setTimeout(later, time);
-      }
-    };
-
-    middleware._timers = timers;
-
-    return middleware;
+  return middleware;
 };
-
