@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ryanseddon/redux-debounce.git"
+    "url": "git+https://github.com/rodomeista/redux-debounced.git"
   },
   "author": "Ryan Seddon",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ryanseddon/redux-debounce/issues"
+    "url": "https://github.com/rodomeista/redux-debounced/issues"
   },
-  "homepage": "https://github.com/ryanseddon/redux-debounce#readme",
+  "homepage": "https://github.com/rodomeista/redux-debounced/#readme",
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-core": "^6.6.5",
