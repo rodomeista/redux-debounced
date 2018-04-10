@@ -10,10 +10,20 @@ export default () => {
     const {
       time,
       key = type,
-      cancel = false
+      cancel = false,
+      leading = false,
+      trailing = true
     } = debounce;
 
-    const shouldDebounce = (time && key) || (cancel && key);
+    const shouldDebounce = ((time && key) || (cancel && key)) && (trailing || leading);
+    const dispatchNow = leading && !timers[key];
+
+    const later = () => {
+      if (trailing && !dispatchNow) {
+        dispatch(action);
+      }
+      timers[key] = null;
+    }
 
     if (!shouldDebounce) {
       return dispatch(action);
@@ -21,14 +31,15 @@ export default () => {
 
     if (timers[key]) {
       clearTimeout(timers[key]);
+      timers[key] = null;
     }
 
     if (!cancel) {
-      return new Promise(resolve => {
-        timers[key] = setTimeout(() => {
-          resolve(dispatch(action));
-        }, time);
-      })
+      if (dispatchNow) {
+        dispatch(action);
+      }
+
+      timers[key] = setTimeout(later, time);
     }
   };
 
